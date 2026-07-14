@@ -1,0 +1,105 @@
+import React from 'react';
+import { Bell, Search, GraduationCap, Menu, X, ArrowLeftRight } from 'lucide-react';
+import { User, UserRole } from '../types';
+
+interface HeaderProps {
+  currentUser: User;
+  onRoleChange: (role: UserRole) => void;
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+}
+
+export default function Header({ currentUser, onRoleChange, sidebarOpen, setSidebarOpen }: HeaderProps) {
+  return (
+    <header className="fixed top-0 left-0 right-0 h-20 bg-white border-b border-slate-100 flex items-center justify-between px-3 lg:px-6 z-40">
+      {/* Brand Logo & Mobile Toggle */}
+      <div className="flex items-center space-x-5">
+        <button 
+          id="mobile-sidebar-toggle"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 -ml-2 rounded-lg text-slate-500 hover:bg-slate-50 lg:hidden focus:outline-none"
+        > 
+          {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+
+        <div className="flex items-center space-x-2.5">
+          <div className="p-2 bg-gradient-to-tr from-indigo-600 to-indigo-700 rounded-xl text-white shadow-md shadow-indigo-600/20">
+            <GraduationCap size={30} className="stroke-[2.5]" />
+          </div>
+          <span className="text-xl font-bold text-slate-900 tracking-tight">
+            EduTest <span className="text-indigo-600 font-medium text-xs bg-indigo-50 px-2 py-0.5 rounded-full ml-1 border border-indigo-100">Portal</span>
+          </span>
+        </div>
+      </div>
+
+      {/* Global Action Area */}
+      <div className="flex items-center space-x-3 lg:space-x-6">
+        {/* Aesthetic Search (hidden on small screens) */}
+        <div className="relative hidden md:block max-w-xs">
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input 
+            type="text" 
+            placeholder="Search exams, courses..." 
+            className="w-56 lg:w-64 bg-slate-50 border border-slate-200/80 rounded-full pl-10 pr-4 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all duration-150"
+          />
+        </div>
+
+        {/* Role Toggle Switch (Super intuitive and beautifully styled) */}
+        <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200/60 shadow-inner">
+          <button
+            id="role-switch-student"
+            onClick={() => onRoleChange('student')}
+            className={`
+              px-3.5 py-1 rounded-full text-xs font-semibold transition-all duration-200 flex items-center space-x-1.5
+              ${currentUser.role === 'student' 
+                ? 'bg-white text-emerald-700 shadow-sm' 
+                : 'text-slate-600 hover:text-slate-900'
+              }
+            `}
+          >
+            <span>Student</span>
+          </button>
+          <button
+            id="role-switch-teacher"
+            onClick={() => onRoleChange('teacher')}
+            className={`
+              px-3.5 py-1 rounded-full text-xs font-semibold transition-all duration-200 flex items-center space-x-1.5
+              ${currentUser.role === 'teacher' 
+                ? 'bg-white text-indigo-700 shadow-sm' 
+                : 'text-slate-600 hover:text-slate-900'
+              }
+            `}
+          >
+            <span>Teacher</span>
+          </button>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center space-x-2 lg:space-x-3">
+          {/* Notifications */}
+          <button className="relative p-2 rounded-full text-slate-500 hover:bg-slate-50 transition-colors">
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white animate-pulse" />
+            <Bell size={18} />
+          </button>
+
+          {/* Divider */}
+          <div className="h-5 w-px bg-slate-200" />
+
+          {/* User Profile */}
+          <div className="flex items-center space-x-2.5 pl-1.5">
+            <img 
+              src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop'} 
+              alt={currentUser.name} 
+              referrerPolicy="no-referrer"
+              className={`w-8.5 h-8.5 rounded-full object-cover ring-2 ${currentUser.role === 'teacher' ? 'ring-indigo-100' : 'ring-emerald-100'}`}
+            />
+            <div className="hidden lg:block text-left mt-4">
+              <p className="text-xsfont-bold text-slate-800 leading-none mb-0">{currentUser.name}</p>
+              <p className="text-2xs text-slate-400 mt-0.5 font-medium">{currentUser.email}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
