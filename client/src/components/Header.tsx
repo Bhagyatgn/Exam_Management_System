@@ -3,13 +3,15 @@ import { Bell, Search, GraduationCap, Menu, X, ArrowLeftRight } from 'lucide-rea
 import { User, UserRole } from '../types';
 
 interface HeaderProps {
-  currentUser: User;
+  currentUser: User | null;
+  role: UserRole;
   onRoleChange: (role: UserRole) => void;
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
+  onLogout: () => void;
 }
 
-export default function Header({ currentUser, onRoleChange, sidebarOpen, setSidebarOpen }: HeaderProps) {
+export default function Header({ currentUser, role, onRoleChange, sidebarOpen, setSidebarOpen, onLogout }: HeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 h-20 bg-white border-b border-slate-100 flex items-center justify-between px-3 lg:px-6 z-40">
       {/* Brand Logo & Mobile Toggle */}
@@ -45,34 +47,36 @@ export default function Header({ currentUser, onRoleChange, sidebarOpen, setSide
         </div>
 
         {/* Role Toggle Switch (Super intuitive and beautifully styled) */}
-        <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200/60 shadow-inner">
-          <button
-            id="role-switch-student"
-            onClick={() => onRoleChange('student')}
-            className={`
-              px-3.5 py-1 rounded-full text-xs font-semibold transition-all duration-200 flex items-center space-x-1.5
-              ${currentUser.role === 'student' 
-                ? 'bg-white text-emerald-700 shadow-sm' 
-                : 'text-slate-600 hover:text-slate-900'
-              }
-            `}
-          >
-            <span>Student</span>
-          </button>
-          <button
-            id="role-switch-teacher"
-            onClick={() => onRoleChange('teacher')}
-            className={`
-              px-3.5 py-1 rounded-full text-xs font-semibold transition-all duration-200 flex items-center space-x-1.5
-              ${currentUser.role === 'teacher' 
-                ? 'bg-white text-indigo-700 shadow-sm' 
-                : 'text-slate-600 hover:text-slate-900'
-              }
-            `}
-          >
-            <span>Teacher</span>
-          </button>
-        </div>
+        {currentUser && currentUser.role === 'teacher' && (
+          <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200/60 shadow-inner">
+            <button
+              id="role-switch-student"
+              onClick={() => onRoleChange('student')}
+              className={`
+                px-3.5 py-1 rounded-full text-xs font-semibold transition-all duration-200 flex items-center space-x-1.5
+                ${role === 'student' 
+                  ? 'bg-white text-emerald-700 shadow-sm' 
+                  : 'text-slate-600 hover:text-slate-900'
+                }
+              `}
+            >
+              <span>Student View</span>
+            </button>
+            <button
+              id="role-switch-teacher"
+              onClick={() => onRoleChange('teacher')}
+              className={`
+                px-3.5 py-1 rounded-full text-xs font-semibold transition-all duration-200 flex items-center space-x-1.5
+                ${role === 'teacher' 
+                  ? 'bg-white text-indigo-700 shadow-sm' 
+                  : 'text-slate-600 hover:text-slate-900'
+                }
+              `}
+            >
+              <span>Teacher View</span>
+            </button>
+          </div>
+        )}
 
         {/* Action Buttons */}
         <div className="flex items-center space-x-2 lg:space-x-3">
@@ -85,19 +89,42 @@ export default function Header({ currentUser, onRoleChange, sidebarOpen, setSide
           {/* Divider */}
           <div className="h-5 w-px bg-slate-200" />
 
-          {/* User Profile */}
-          <div className="flex items-center space-x-2.5 pl-1.5">
-            <img 
-              src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop'} 
-              alt={currentUser.name} 
-              referrerPolicy="no-referrer"
-              className={`w-8.5 h-8.5 rounded-full object-cover ring-2 ${currentUser.role === 'teacher' ? 'ring-indigo-100' : 'ring-emerald-100'}`}
-            />
-            <div className="hidden lg:block text-left mt-4">
-              <p className="text-xsfont-bold text-slate-800 leading-none mb-0">{currentUser.name}</p>
-              <p className="text-2xs text-slate-400 mt-0.5 font-medium">{currentUser.email}</p>
+          {/* User Profile or Login Actions */}
+          {currentUser ? (
+            <div className="flex items-center space-x-2.5 pl-1.5">
+              <img 
+                src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop'} 
+                alt={currentUser.name} 
+                referrerPolicy="no-referrer"
+                className={`w-8.5 h-8.5 rounded-full object-cover ring-2 ${role === 'teacher' ? 'ring-indigo-100' : 'ring-emerald-100'}`}
+              />
+              <div className="hidden lg:block text-left">
+                <p className="text-xs font-bold text-slate-800 leading-none mb-0">{currentUser.name}</p>
+                <p className="text-2xs text-slate-400 mt-1 font-medium leading-none">{currentUser.email}</p>
+              </div>
+              <button 
+                onClick={onLogout}
+                className="ml-2 px-2.5 py-1 text-2xs font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-slate-200 hover:border-rose-100 transition-all duration-150 focus:outline-none"
+              >
+                Log Out
+              </button>
             </div>
-          </div>
+          ) : (
+            <div className="flex items-center space-x-2 pl-1.5">
+              <a 
+                href="/login" 
+                className="px-3 py-1.5 text-xs font-bold text-indigo-600 border border-indigo-200 rounded-xl hover:bg-indigo-50 transition-colors"
+              >
+                Log In
+              </a>
+              <a 
+                href="/register" 
+                className="px-3 py-1.5 text-xs font-bold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors"
+              >
+                Register
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </header>

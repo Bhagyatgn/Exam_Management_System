@@ -19,6 +19,7 @@ interface StudentDashboardProps {
   onTakeExam: (exam: Exam) => void;
   onViewResults: (submission: Submission) => void;
   setSelectedTab: (tab: string) => void;
+  currentUser: any;
 }
 
 export default function StudentDashboard({
@@ -27,7 +28,8 @@ export default function StudentDashboard({
   submissions,
   onTakeExam,
   onViewResults,
-  setSelectedTab
+  setSelectedTab,
+  currentUser
 }: StudentDashboardProps) {
   const [selectedModuleFilter, setSelectedModuleFilter] = useState<string | null>(null);
 
@@ -109,7 +111,7 @@ export default function StudentDashboard({
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_45%)]" />
         <div className="relative z-10 space-y-1.5">
           <p className="text-emerald-200 text-xs font-bold tracking-widest uppercase">ACADEMIC DASHBOARD</p>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">Welcome Back, John!</h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">Welcome Back, {currentUser ? currentUser.name : 'Guest'}!</h1>
           <p className="text-emerald-50/80 text-sm">
             You have <strong className="text-white underline underline-offset-4 decoration-emerald-300">{activeCount} available exams</strong> that need to be taken today. Good luck!
           </p>

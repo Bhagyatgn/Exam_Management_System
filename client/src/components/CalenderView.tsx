@@ -57,7 +57,7 @@ export default function CalendarView({
     };
   };
 
-  // Submissions map
+  // Submissions map,using examID->submission
   const submissionMap = new Map<string, Submission>();
   submissions.forEach(sub => {
     submissionMap.set(sub.examId, sub);

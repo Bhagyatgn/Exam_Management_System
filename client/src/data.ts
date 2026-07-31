@@ -215,7 +215,7 @@ export function getStoredData() {
       modules: INITIAL_MODULES,
       exams: INITIAL_EXAMS,
       submissions: INITIAL_SUBMISSIONS,
-      currentUser: INITIAL_USERS[0],
+      currentUser: null,
     };
   }
 
@@ -230,7 +230,7 @@ export function getStoredData() {
     modules: modules ? JSON.parse(modules) : INITIAL_MODULES,
     exams: exams ? JSON.parse(exams) : INITIAL_EXAMS,
     submissions: submissions ? JSON.parse(submissions) : INITIAL_SUBMISSIONS,
-    currentUser: currentUser ? JSON.parse(currentUser) : INITIAL_USERS[0],
+    currentUser: currentUser ? JSON.parse(currentUser) : null,
   };
 }
 

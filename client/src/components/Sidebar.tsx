@@ -18,9 +18,10 @@ interface SidebarProps {
   setTab: (tab: string) => void;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  isLoggedIn: boolean;
 }
 
-export default function Sidebar({ role, currentTab, setTab, isOpen, setIsOpen }: SidebarProps) {
+export default function Sidebar({ role, currentTab, setTab, isOpen, setIsOpen, isLoggedIn }: SidebarProps) {
   const studentNavItems = [
     { id: 'dashboard', label: 'Home', icon: LayoutDashboard },
     { id: 'modules', label: 'Enrolled Modules', icon: BookOpen },
@@ -60,12 +61,12 @@ export default function Sidebar({ role, currentTab, setTab, isOpen, setIsOpen }:
           <div className="space-y-6">
             {/* Role Indicator Badge */}
             <div className="px-3 py-2.5 bg-slate-50 rounded-xl border border-slate-100 flex items-center space-x-3">
-              <div className={`p-2 rounded-lg ${role === 'teacher' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'}`}>
+              <div className={`p-2 rounded-lg ${!isLoggedIn ? 'bg-slate-100 text-slate-500' : role === 'teacher' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'}`}>
                 <UserCheck size={18} />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-medium">LOGGED IN AS</p>
-                <p className="text-sm font-semibold text-slate-800 capitalize">{role} Portal</p>
+                <p className="text-xs text-slate-400 font-medium">{isLoggedIn ? 'LOGGED IN AS' : 'BROWSER MODE'}</p>
+                <p className="text-sm font-semibold text-slate-800 capitalize">{isLoggedIn ? `${role} Portal` : 'Guest Portal'}</p>
               </div>
             </div>
 

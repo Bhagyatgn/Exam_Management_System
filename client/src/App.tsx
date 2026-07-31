@@ -12,6 +12,10 @@ import {
   Submission, 
   SubmissionAnswer 
 } from './types';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Login from "./pages/login";
+import Register from "./pages/Register";
 
 // Components
 import Header from './components/Header';
@@ -35,12 +39,14 @@ import {
   Users 
 } from 'lucide-react';
 
-export default function App() {
+function ExamSystem() {
   // Load data from localStorage or initial mock state
   const [appState, setAppState] = useState(() => getStoredData());
 
   // Navigation states
-  const [role, setRole] = useState<UserRole>('student');
+  const [role, setRole] = useState<UserRole>(() => {
+    return appState.currentUser ? (appState.currentUser.role === 'teacher' ? 'teacher' : 'student') : 'student';
+  });
   const [studentTab, setStudentTab] = useState('dashboard');
   const [teacherTab, setTeacherTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -57,12 +63,14 @@ export default function App() {
     message: string,
   }>({ show: false, type: 'success', title: '', message: '' });
 
-  // Sync users with role change
+  // Sync view state role when logged-in user changes (e.g. login/logout)
   useEffect(() => {
-    const matchedUser = appState.users.find(u => u.role === role) || appState.users[0];
-    setAppState(prev => ({ ...prev, currentUser: matchedUser }));
-    saveStoredData({ currentUser: matchedUser });
-  }, [role]);
+    if (appState.currentUser) {
+      setRole(appState.currentUser.role === 'teacher' ? 'teacher' : 'student');
+    } else {
+      setRole('student');
+    }
+  }, [appState.currentUser]);
 
   // Save changes to local storage whenever exams, submissions, or modules update
   const updateExams = (newExams: Exam[]) => {
@@ -98,15 +106,36 @@ export default function App() {
 
   // Switch role between Student and Teacher
   const handleRoleChange = (newRole: UserRole) => {
-    setRole(newRole);
-    setSidebarOpen(false);
-    setReviewingSubmissionId(null);
-    setTakingExam(null);
-    triggerToast('info', 'Portal Switched', `Switched to ${newRole === 'teacher' ? 'Teacher Console' : 'Student Dashboard'}.`);
+    if (appState.currentUser?.role === 'teacher') {
+      setRole(newRole);
+      setSidebarOpen(false);
+      setReviewingSubmissionId(null);
+      setTakingExam(null);
+      triggerToast('info', 'Portal Switched', `Switched to ${newRole === 'teacher' ? 'Teacher Console' : 'Student Dashboard'}.`);
+    } else {
+      triggerToast('error', 'Access Denied', 'Only instructors can switch consoles.');
+    }
+  };
+
+  // Sign out handler
+  const handleLogout = () => {
+    localStorage.removeItem('ems_current_user');
+    localStorage.removeItem('token');
+    triggerToast('success', 'Logged Out', 'Successfully logged out.');
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1000);
   };
 
   // Start taking an exam
   const handleStartExam = (exam: Exam) => {
+    if (!appState.currentUser) {
+      triggerToast('info', 'Sign In Required', 'Please register or log in to take exams.');
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 1500);
+      return;
+    }
     setTakingExam(exam);
   };
 
@@ -236,6 +265,7 @@ export default function App() {
               onTakeExam={handleStartExam}
               onViewResults={(sub) => setReviewingSubmissionId(sub.id)}
               setSelectedTab={setStudentTab}
+              currentUser={appState.currentUser}
             />
           );
 
@@ -503,9 +533,11 @@ export default function App() {
       {/* Dynamic Global Header */}
       <Header 
         currentUser={appState.currentUser}
+        role={role}
         onRoleChange={handleRoleChange}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
+        onLogout={handleLogout}
       />
 
       {/* Responsive Global Sidebar */}
@@ -515,6 +547,7 @@ export default function App() {
         setTab={setTab}
         isOpen={sidebarOpen}
         setIsOpen={setSidebarOpen}
+        isLoggedIn={!!appState.currentUser}
       />
 
       {/* Toast Notification */}
@@ -544,4 +577,34 @@ export default function App() {
       </main>
     </div>
   );
+}
+export default function App() {
+
+  return (
+    <BrowserRouter>
+
+      <Routes>
+
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+
+        <Route
+          path="/register"
+          element={<Register />}
+        />
+
+
+        <Route
+          path="/*"
+          element={<ExamSystem />}
+        />
+
+      </Routes>
+
+    </BrowserRouter>
+  );
+
 }
