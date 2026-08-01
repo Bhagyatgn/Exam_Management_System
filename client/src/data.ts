@@ -17,44 +17,7 @@ export const INITIAL_USERS: User[] = [
   },
 ];
 
-export const INITIAL_MODULES: Module[] = [
-  {
-    id: 'mod-cs101',
-    code: 'CS-101',
-    name: 'Introduction to Computer Science',
-    teacherName: 'Dr. Sarah Jenkins',
-    description: 'Fundamental concepts of computer science including algorithms, basic data structures, and programming paradigms.',
-    color: 'indigo',
-    studentCount: 45,
-  },
-  {
-    id: 'mod-math202',
-    code: 'MATH-202',
-    name: 'Advanced Calculus & Analysis',
-    teacherName: 'Prof. Alan Turing',
-    description: 'Study of limits, derivatives, integrals, infinite series, and multivariable functions with rigorous proofs.',
-    color: 'rose',
-    studentCount: 38,
-  },
-  {
-    id: 'mod-phys105',
-    code: 'PHYS-105',
-    name: 'Classical Mechanics & Wave Theory',
-    teacherName: 'Dr. Isaac Newton',
-    description: 'Newtonian mechanics, rotational dynamics, gravitation, simple harmonic motion, and mechanical waves.',
-    color: 'emerald',
-    studentCount: 41,
-  },
-  {
-    id: 'mod-eng110',
-    code: 'ENG-110',
-    name: 'English Literature & Composition',
-    teacherName: 'Prof. Jane Austen',
-    description: 'Critical reading of classic literature and development of advanced academic writing and argumentative styles.',
-    color: 'amber',
-    studentCount: 32,
-  },
-];
+export const INITIAL_MODULES: Module[] = [];
 
 export const INITIAL_EXAMS: Exam[] = [
   {
@@ -212,7 +175,7 @@ export function getStoredData() {
   if (typeof window === 'undefined') {
     return {
       users: INITIAL_USERS,
-      modules: INITIAL_MODULES,
+      modules: [],
       exams: INITIAL_EXAMS,
       submissions: INITIAL_SUBMISSIONS,
       currentUser: null,
@@ -220,14 +183,13 @@ export function getStoredData() {
   }
 
   const users = localStorage.getItem('ems_users');
-  const modules = localStorage.getItem('ems_modules');
   const exams = localStorage.getItem('ems_exams');
   const submissions = localStorage.getItem('ems_submissions');
   const currentUser = localStorage.getItem('ems_current_user');
 
   return {
     users: users ? JSON.parse(users) : INITIAL_USERS,
-    modules: modules ? JSON.parse(modules) : INITIAL_MODULES,
+    modules: [], // Always start empty, wait for backend
     exams: exams ? JSON.parse(exams) : INITIAL_EXAMS,
     submissions: submissions ? JSON.parse(submissions) : INITIAL_SUBMISSIONS,
     currentUser: currentUser ? JSON.parse(currentUser) : null,

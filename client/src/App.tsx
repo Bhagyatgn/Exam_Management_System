@@ -13,8 +13,9 @@ import {
   SubmissionAnswer 
 } from './types';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import api from './api/api';
 
-import Login from "./pages/login";
+import Login from "./pages/Login";
 import Register from "./pages/Register";
 
 // Components
@@ -27,6 +28,7 @@ import ExamResultsView from './components/ExamResultsView';
 import ExamCreationView from './components/ExamCreationView';
 import SubmissionsView from './components/SubmissionsView';
 import CalendarView from './components/CalenderView';
+import ModulePage from './modules/moduleManagement/ModulePage';
 
 import { 
   AlertCircle, 
@@ -103,6 +105,28 @@ function ExamSystem() {
       return () => clearTimeout(timer);
     }
   }, [toast.show]);
+
+  // Fetch modules from backend
+  useEffect(() => {
+    async function fetchModules() {
+      try {
+        const response = await api.get('/modules');
+        const mappedModules = response.data.map((m: any) => ({
+          id: m.id,
+          code: m.course_code,
+          name: m.course_name,
+          teacherName: 'Unknown',
+          description: m.description,
+          color: 'indigo',
+          studentCount: 0,
+        }));
+        setAppState(prev => ({ ...prev, modules: mappedModules }));
+      } catch (error) {
+        console.error("Failed to fetch modules", error);
+      }
+    }
+    fetchModules();
+  }, []);
 
   // Switch role between Student and Teacher
   const handleRoleChange = (newRole: UserRole) => {
@@ -441,37 +465,7 @@ function ExamSystem() {
         case 'modules':
           return (
             <div className="space-y-6 animate-fade-in">
-              <div className="space-y-1">
-                <h1 className="text-xl font-extrabold text-slate-800">Course Administration</h1>
-                <p className="text-xs text-slate-400 font-semibold">Deploy syllabus changes, view enrollments, and check class lists.</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5" id="teacher-modules-full-grid">
-                {appState.modules.map(mod => {
-                  const moduleExams = appState.exams.filter(e => e.moduleId === mod.id);
-                  return (
-                    <div key={mod.id} className="bg-white border border-slate-100 p-6 rounded-3xl shadow-sm space-y-4 hover:shadow-md transition-all duration-200">
-                      <div className="flex justify-between items-start">
-                        <span className="px-3 py-1 bg-indigo-50 border border-indigo-100 rounded text-xs font-bold text-indigo-700">{mod.code}</span>
-                        <span className="text-3xs font-semibold text-slate-400 flex items-center">
-                          <Users size={12} className="mr-1 text-slate-300" />
-                          {mod.studentCount} Students
-                        </span>
-                      </div>
-                      <div>
-                        <h3 className="text-base font-extrabold text-slate-850">{mod.name}</h3>
-                        <p className="text-xs text-slate-400 mt-0.5">Instructor: {mod.teacherName}</p>
-                      </div>
-                      <p className="text-xs text-slate-500 leading-relaxed">{mod.description}</p>
-
-                      <div className="pt-3 border-t border-slate-50 flex justify-between text-3xs font-semibold text-slate-500">
-                        <span>Created Exams:</span>
-                        <span className="font-bold text-slate-850">{moduleExams.length}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <ModulePage />
             </div>
           );
 

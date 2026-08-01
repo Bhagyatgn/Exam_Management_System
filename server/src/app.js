@@ -23,7 +23,7 @@ app.use(express.json());
 
 
 // Test API
-app.get("/",(req,res)=>{
+app.get("/api/health",(req,res)=>{
 
     res.json({
         message:"Exam Management API is running"
@@ -41,12 +41,20 @@ app.use(
 
 
 
+const path = require("path");
+
 // Module APIs
 app.use(
     "/api/modules",
     moduleRoutes
 );
 
+const distPath = path.join(__dirname, "../../client/dist");
+app.use(express.static(distPath));
 
+// SPA Fallback
+app.use((req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
+});
 
 module.exports = app;
