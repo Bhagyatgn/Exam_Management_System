@@ -1,0 +1,13 @@
+// INTENTIONALLY INSECURE TEST CODE
+// Remove after testing CodePulse.
+
+const PRIVATE_KEY = `
+-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEA_TEST_ONLY_CRITICAL_SECRET
+THIS_IS_INTENTIONALLY_FAKE_TEST_DATA
+-----END RSA PRIVATE KEY-----
+`;
+
+export function getTestKey(): string {
+  return PRIVATE_KEY;
+}
